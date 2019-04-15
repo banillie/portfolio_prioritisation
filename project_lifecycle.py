@@ -18,9 +18,9 @@ def add_sop_pend_data(m_data, dict):
         except KeyError:
             dict[name]['Start of Operation'] = None
         try:
-            dict[name]['Project - End Date'] = m_data[name]['Project - End Date']
+            dict[name]['Project End Date'] = m_data[name]['Project End Date']
         except KeyError:
-            dict[name]['Project - End Date'] = None
+            dict[name]['Project End Date'] = None
 
     return dict
 
@@ -58,7 +58,7 @@ def final_dict_simple(dict_one, con_list):
         for key in p_dict_one:
             if key in con_list:
                 try:
-                    lower_dict[key] = concatenate_dates(p_dict_one[key])
+                    lower_dict[key] = concatenate_dates(p_dict_one[key], bicc_date)
                 except TypeError:
                     lower_dict[key] = 'check data'
             else:
@@ -73,9 +73,18 @@ def placing_excel_rawdata(dict_one, keys):
     wb = Workbook()
     ws = wb.active
 
+    ws.cell(row=1, column=1).value = 'Proj/Prog Name'
+    ws.cell(row=1, column=8).value = 'SoP'
+    ws.cell(row=1, column=9).value = 'End Date'
+
+    for i, item in enumerate(keys):
+        ws.cell(row=1, column=2 + i).value = item
+
     row_num = 2
     for project_name in dict_one:
         ws.cell(row=row_num, column=1).value = project_name
+        ws.cell(row=row_num, column=8).value = dict_one[project_name]['Start of Operation']
+        ws.cell(row=row_num, column=9).value = dict_one[project_name]['Project End Date']
         for i, item in enumerate(keys):
             ws.cell(row=row_num, column=2+i).value = dict_one[project_name][item]
 
@@ -234,7 +243,7 @@ dash_keys = ['BICC approval point', 'Total Forecast', 'Adjusted Benefits Cost Ra
 #'''key of interest for previous quarter'''
 #dash_keys_previous_quarter = ['Departmental DCA']
 
-keys_to_concatenate = ['Start of Operation', 'Project - End Date']
+keys_to_concatenate = ['Start of Operation', 'Project End Date']
 
 #'''1) Provide file path to empty dashboard document'''
 #wb = load_workbook(
