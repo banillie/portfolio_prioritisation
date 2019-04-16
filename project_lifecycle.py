@@ -2,7 +2,7 @@
 Programme for project lifecycle analysis
 
 '''
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from bcompiler.utils import project_data_from_master
 import datetime
 from openpyxl.styles import PatternFill, Font
@@ -95,14 +95,16 @@ def placing_excel_rawdata(dict_one, keys):
 '''function that places all information into the summary dashboard sheet'''
 def placing_excel_dashboard(dict_one, dict_two):
 
+    ['BICC approval point', 'Total Forecast', 'Adjusted Benefits Cost Ratio (BCR)',
+     'VfM Category', 'Total BEN Forecast - Total Monetised Benefits', 'Departmental DCA']
+
     for row_num in range(2, ws.max_row + 1):
-        project_name = ws.cell(row=row_num, column=3).value
+        project_name = ws.cell(row=row_num, column=2).value
         print(project_name)
         if project_name in dict_one:
-            ws.cell(row=row_num, column=4).value = dict_one[project_name]['Total Forecast']
-            ws.cell(row=row_num, column=6).value = dict_one[project_name]['Change']
-            ws.cell(row=row_num, column=7).value = dict_one[project_name]['Departmental DCA']
-            ws.cell(row=row_num, column=8).value = dict_one[project_name]['GMPP - IPA DCA']
+            ws.cell(row=row_num, column=3).value = dict_one[project_name]['Total Forecast']
+            ws.cell(row=row_num, column=4).value = dict_one[project_name]['Departmental DCA']
+            ws.cell(row=row_num, column=8).value = dict_one[project_name]['']
             ws.cell(row=row_num, column=9).value = dict_one[project_name]['BICC approval point']
             ws.cell(row=row_num, column=10).value = dict_one[project_name]['Start of Operation']
             ws.cell(row=row_num, column=11).value = dict_one[project_name]['Project - End Date']
@@ -245,10 +247,10 @@ dash_keys = ['BICC approval point', 'Total Forecast', 'Adjusted Benefits Cost Ra
 
 keys_to_concatenate = ['Start of Operation', 'Project End Date']
 
-#'''1) Provide file path to empty dashboard document'''
-#wb = load_workbook(
-#    'C:\\Users\\Standalone\\Will\\masters folder\\summary_dashboard_docs\\Q4_2018\\dashboard master_Q4_1819.xlsx')
-#ws = wb.active
+'''1) Provide file path to empty dashboard document'''
+wb = load_workbook(
+    'C:\\Users\\Standalone\\Will\\masters folder\\lifecycle_analysis\\lifecycle_dashboard_master_Q4_1819.xlsx')
+ws = wb.active
 
 '''2) Provide file path to master data sets'''
 data_one = project_data_from_master(
@@ -268,7 +270,7 @@ m_data = all_milestone_data(data_one)
 latest_q_dict_2 = add_sop_pend_data(m_data, latest_q_dict)
 merged_dict = final_dict_simple(latest_q_dict_2, keys_to_concatenate)
 
-wb = placing_excel_rawdata(merged_dict, dash_keys)
+wb = placing_excel_dashboard(merged_dict, dash_keys)
 
 '''4) provide file path and specific name of output file.'''
 wb.save(
