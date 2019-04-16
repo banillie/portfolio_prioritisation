@@ -95,27 +95,24 @@ def placing_excel_rawdata(dict_one, keys):
 '''function that places all information into the summary dashboard sheet'''
 def placing_excel_dashboard(dict_one, dict_two):
 
-    ['BICC approval point', 'Total Forecast', 'Adjusted Benefits Cost Ratio (BCR)',
-     'VfM Category', 'Total BEN Forecast - Total Monetised Benefits', 'Departmental DCA']
 
     for row_num in range(2, ws.max_row + 1):
-        project_name = ws.cell(row=row_num, column=2).value
+        project_name = ws.cell(row=row_num, column=3).value
         print(project_name)
         if project_name in dict_one:
-            ws.cell(row=row_num, column=3).value = dict_one[project_name]['Total Forecast']
-            ws.cell(row=row_num, column=4).value = dict_one[project_name]['Departmental DCA']
-            ws.cell(row=row_num, column=8).value = dict_one[project_name]['']
-            ws.cell(row=row_num, column=9).value = dict_one[project_name]['BICC approval point']
-            ws.cell(row=row_num, column=10).value = dict_one[project_name]['Start of Operation']
-            ws.cell(row=row_num, column=11).value = dict_one[project_name]['Project - End Date']
-            ws.cell(row=row_num, column=12).value = dict_one[project_name]['SRO Finance confidence']
-            ws.cell(row=row_num, column=13).value = dict_one[project_name]['Last time at BICC']
-            ws.cell(row=row_num, column=14).value = dict_one[project_name]['Next at BICC']
+            ws.cell(row=row_num, column=4).value = dict_one[project_name]['Total Forecast']
+            ws.cell(row=row_num, column=5).value = dict_one[project_name]['Departmental DCA']
+            ws.cell(row=row_num, column=6).value = dict_one[project_name]['Adjusted Benefits Cost Ratio (BCR)']
+            ws.cell(row=row_num, column=7).value = dict_one[project_name]['VfM Category']
+            ws.cell(row=row_num, column=8).value = dict_one[project_name]['Total BEN Forecast - Total Monetised ' \
+                                                                          'Benefits']
+            ws.cell(row=row_num, column=9).value = dict_one[project_name]['Start of Operation']
+            ws.cell(row=row_num, column=10).value = dict_one[project_name]['Project End Date']
 
     for row_num in range(2, ws.max_row + 1):
         project_name = ws.cell(row=row_num, column=3).value
         if project_name in dict_two:
-            ws.cell(row=row_num, column=5).value = dict_two[project_name]['Departmental DCA']
+            ws.cell(row=row_num, column=20).value = dict_two[project_name]['Departmental DCA']
 
     # Highlight cells that contain RAG text, with background and text the same colour. column E.
     ag_text = Font(color="00a5b700")
@@ -197,6 +194,7 @@ def placing_excel_dashboard(dict_one, dict_two):
     rule.formula = ['NOT(ISERROR(SEARCH("NEW",F1)))']
     ws.conditional_formatting.add('F1:F100', rule)
 
+    '''
     # assign the icon set to a rule
     first = FormatObject(type='num', val=-1)
     second = FormatObject(type='num', val=0)
@@ -236,6 +234,8 @@ def placing_excel_dashboard(dict_one, dict_two):
             ws.cell(row=row_num, column=13).font = ft
         if ws.cell(row=row_num, column=14).value in lis:
             ws.cell(row=row_num, column=14).font = ft
+            
+    '''
     return wb
 
 '''keys of interest for current quarter'''
