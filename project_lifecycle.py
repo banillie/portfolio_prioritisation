@@ -68,6 +68,33 @@ def final_dict_simple(dict_one, con_list):
 
     return upper_dict
 
+def up_or_down(latest_dca, last_dca):
+
+    if latest_dca == last_dca:
+        return (int(0))
+    elif latest_dca != last_dca:
+        if last_dca == 'Green':
+            if latest_dca != 'Amber/Green':
+                return (int(-1))
+        elif last_dca == 'Amber/Green':
+            if latest_dca == 'Green':
+                return (int(1))
+            else:
+                return (int(-1))
+        elif last_dca == 'Amber':
+            if latest_dca == 'Green':
+                return (int(1))
+            elif latest_dca == 'Amber/Green':
+                return (int(1))
+            else:
+                return (int(-1))
+        elif last_dca == 'Amber/Red':
+            if latest_dca == 'Red':
+                return (int(-1))
+            else:
+                return (int(1))
+        else:
+            return (int(1))
 
 def placing_excel_rawdata(dict_one, keys):
     wb = Workbook()
@@ -91,6 +118,108 @@ def placing_excel_rawdata(dict_one, keys):
         row_num += 1
 
     return wb
+
+def concatenate_dates(date):
+    today = bicc_date
+    if date != None:
+        a = (date - today.date()).days
+        year = 365
+        month = 30
+        fortnight = 14
+        week = 7
+        if a >= 365:
+            yrs = int(a / year)
+            holding_days_years = a % year
+            months = int(holding_days_years / month)
+            holding_days_months = a % month
+            fortnights = int(holding_days_months / fortnight)
+            weeks = int(holding_days_months / week)
+        elif 0 <= a <= 365:
+            yrs = 0
+            months = int(a / month)
+            holding_days_months = a % month
+            fortnights = int(holding_days_months / fortnight)
+            weeks = int(holding_days_months / week)
+            # if 0 <= a <=60:
+        elif a <= -365:
+            yrs = int(a / year)
+            holding_days = a % -year
+            months = int(holding_days / month)
+            holding_days_months = a % -month
+            fortnights = int(holding_days_months / fortnight)
+            weeks = int(holding_days_months / week)
+        elif -365 <= a <= 0:
+            yrs = 0
+            months = int(a / month)
+            holding_days_months = a % -month
+            fortnights = int(holding_days_months / fortnight)
+            weeks = int(holding_days_months / week)
+            # if -60 <= a <= 0:
+        else:
+            print('something is wrong and needs checking')
+
+        if yrs == 1:
+            if months == 1:
+                return ('{} yr, {} mth'.format(yrs, months))
+            if months > 1:
+                return ('{} yr, {} mths'.format(yrs, months))
+            else:
+                return ('{} yr'.format(yrs))
+        elif yrs > 1:
+            if months == 1:
+                return ('{} yrs, {} mth'.format(yrs, months))
+            if months > 1:
+                return ('{} yrs, {} mths'.format(yrs, months))
+            else:
+                return ('{} yrs'.format(yrs))
+        elif yrs == 0:
+            if a == 0:
+                return ('Today')
+            elif 1 <= a <= 6:
+                return ('This week')
+            elif 7 <= a <= 13:
+                return ('Next week')
+            elif -7 <= a <= -1:
+                return ('Last week')
+            elif -14 <= a <= -8:
+                return ('-2 weeks')
+            elif 14 <= a <= 20:
+                return ('2 weeks')
+            elif 20 <= a <= 60:
+                if today.month == date.month:
+                    return ('Later this mth')
+                elif (date.month - today.month) == 1:
+                    return ('Next mth')
+                else:
+                    return ('2 mths')
+            elif -60 <= a <= -15:
+                if today.month == date.month:
+                    return ('Earlier this mth')
+                elif (date.month - today.month) == -1:
+                    return ('Last mth')
+                else:
+                    return ('-2 mths')
+            elif months == 12:
+                return ('1 yr')
+            else:
+                return ('{} mths'.format(months))
+
+        elif yrs == -1:
+            if months == -1:
+                return ('{} yr, {} mth'.format(yrs, -(months)))
+            if months < -1:
+                return ('{} yr, {} mths'.format(yrs, -(months)))
+            else:
+                return ('{} yr'.format(yrs))
+        elif yrs < -1:
+            if months == -1:
+                return ('{} yrs, {} mth'.format(yrs, -(months)))
+            if months < -1:
+                return ('{} yrs, {} mths'.format(yrs, -(months)))
+            else:
+                return ('{} yrs'.format(yrs))
+    else:
+        return ('None')
 
 '''function that places all information into the summary dashboard sheet'''
 def placing_excel_dashboard(dict_one, dict_two):
@@ -238,12 +367,11 @@ def placing_excel_dashboard(dict_one, dict_two):
     '''
     return wb
 
-'''keys of interest for current quarter'''
+
 dash_keys = ['BICC approval point', 'Total Forecast', 'Adjusted Benefits Cost Ratio (BCR)',
              'VfM Category', 'Total BEN Forecast - Total Monetised Benefits', 'Departmental DCA']
 
-#'''key of interest for previous quarter'''
-#dash_keys_previous_quarter = ['Departmental DCA']
+dash_keys_previous_quarter = ['Departmental DCA']
 
 keys_to_concatenate = ['Start of Operation', 'Project End Date']
 
@@ -254,9 +382,9 @@ ws = wb.active
 
 '''2) Provide file path to master data sets'''
 data_one = project_data_from_master(
-    'C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_3_2018.xlsx')
+    'C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_4_2018.xlsx')
 data_two = project_data_from_master(
-    'C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_2_2018.xlsx')
+    'C:\\Users\\Standalone\\Will\\masters folder\\core data\\master_3_2018.xlsx')
 
 p_names = list(data_one.keys())
 #p_names = ['Digital Railway'] # can be useful for checking specific projects/the programme so leaving for now
@@ -264,14 +392,18 @@ p_names = list(data_one.keys())
 '''3) Specify data of bicc that is discussing the report. NOTE: Python date format is (YYYY,MM,DD)'''
 bicc_date = datetime.datetime(2019, 5, 13)
 
+'''4) chose output - raw data or into dashboard'''
+'''raw data'''
+#latest_q_dict = inital_dict(p_names, data_one, dash_keys)
+#wb = placing_excel_rawdata(latest_q_dict, dash_keys)
+
+'''dashboard'''
 latest_q_dict = inital_dict(p_names, data_one, dash_keys)
-#last_q_dict = inital_dict(p_names, data_two, dash_keys_previous_quarter)
+last_q_dict = inital_dict(p_names, data_two, dash_keys_previous_quarter)
 m_data = all_milestone_data(data_one)
 latest_q_dict_2 = add_sop_pend_data(m_data, latest_q_dict)
-merged_dict = final_dict_simple(latest_q_dict_2, keys_to_concatenate)
+merged_dict = final_dict(latest_q_dict_2, last_q_dict, keys_to_concatenate, 'Departmental DCA')
 
 wb = placing_excel_dashboard(merged_dict, dash_keys)
 
-'''4) provide file path and specific name of output file.'''
-wb.save(
-    'C:\\Users\\Standalone\\Will\\testing.xlsx')
+wb.save('C:\\Users\\Standalone\\Will\\masters folder\\lifecycle_analysis\\lifecycle_dashboard_Q4_1819.xlsx')
